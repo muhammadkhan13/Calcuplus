@@ -5,114 +5,158 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
+  Button,
   Text,
+  TextInput,
+  TouchableOpacity,
   useColorScheme,
   View,
+  Dimensions,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const screenWidth= Dimensions.get("window").width;
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+function App() {
+    const [input, onChangeInput] = React.useState('');
+    const [ans, setAns] = React.useState('');
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+    const handlePress = (value) => {
+        onChangeInput((prev) => prev + value);
+        };
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    const handleArithmetic = () => {
+        try {
+            let equation = input.replace(/Ans/g, ans);
+            console.log(equation);
+            let result = eval(equation);
+            onChangeInput(result.toString());
+            setAns(result);
+            console.log(ans);
+            } catch (error) {
+                console.log(error.message);
+                onChangeInput("ERROR");
+            }
+        };
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    const handleOperation = (operation) => {
+        try {
+            let equation = input.replace(/Ans/g, ans);
+            const entry = parseFloat(eval(equation).toString());
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+            if (isNaN(entry)) {
+                throw new Error("INPUT ERROR")
+                }
+
+            let result = 0;
+
+            switch (operation) {
+                case "sin":
+                    result = Math.sin(entry);
+                    break;
+                case "cos":
+                    result = Math.cos(entry);
+                    break;
+                case "tan":
+                    result = Math.tan(entry);
+                    break;
+                case "log":
+                    result = Math.log(entry);
+                    break;
+                default:
+                    throw new Error("INVALID");
+                    }
+
+            onChangeInput(result.toString());
+            setAns(result.toString());
+        } catch (error) {
+            onChangeInput("ERROR");
+        }
+    };
+
+    const handleClear = () => {
+        onChangeInput("");
+        };
+
+    const buttons = [
+        ["sin", "cos", "tan", "log"],
+        ["7", "8", "9", "/"],
+        ["4", "5", "6", "*"],
+        ["1", "2", "3", "+"],
+        ["0", ".", "+/-", "="],
+        ["C", "(", ")", "Ans"],
+        ];
+
+    return(
+        <View style={styles.calculator}>
+            <View style={styles.inputField}>
+                <Text style={styles.inputCalculation}>{input}</Text>
+            </View>
+            <ScrollView style={styles.buttonGrid}>
+                {buttons.map((buttonRow, buttonIndex) => (
+                    <View
+                    key={buttonIndex}
+                    style={styles.buttonRow}>
+                        {buttonRow.map((button, rowIndex) => (
+                            <TouchableOpacity
+                            key={rowIndex}
+                            style={styles.button}
+                            onPress={() =>
+                                button === "=" ? handleArithmetic()
+                                : button === "C" ? handleClear()
+                                : button === "sin" || button === "cos" || button === "tan" || button === "log" ? handleOperation(button)
+                                : handlePress(button)}>
+                                <Text>{button}</Text>
+                            </TouchableOpacity>
+                            ))}
+                    </View>))}
+            </ScrollView>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+        );
+    };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+  calculator: {
+      flex: 1,
+      justifyContent: "flex-start",
+      padding: 10,
+      },
+  inputField: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "flex-end",
+      marginBottom: 10,
+      },
+  inputCalculation: {
+      fontSize: 30,
+      fontWeight: "bold",
+      },
+  buttonGrid: {
+      flex: 4,
+      },
+  buttonGridItems: {
+      justifyContent: "center",
+      alignItems: "center",
+      },
+  buttonRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 10,
+      },
+  button: {
+      width: 50,
+      height: 50,
+      justifyContent: "center",
+      alignItems: "center",
+      margin: 5,
+      },
+  });
+
 
 export default App;
