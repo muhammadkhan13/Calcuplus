@@ -1,4 +1,10 @@
 {
   "name": "Calcuplus",
-  "displayName": "Calcuplus"
+  "displayName": "Calcuplus",
+  "extra": {
+    "eas": {
+      "projectId": "7e540034-6fdc-43d9-b627-10efcd526379"
+    }
+  },
+  "owner": "mkhan827"
 }
