@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -8,6 +8,7 @@ import {
   Button,
   Text,
   TextInput,
+  FlatList,
   TouchableOpacity,
   useColorScheme,
   View,
@@ -15,12 +16,14 @@ import {
 } from 'react-native';
 
 
-const Calculator = () => {
+const Calculator = ({ navigation }) => {
     const screenWidth= Dimensions.get("window").width;
     const [input, onChangeInput] = React.useState('');
     const [ans, setAns] = React.useState('');
     const [resetDisplay, setResetDisplay] = React.useState(false);
     const [operandPressed, setOperandPressed] = React.useState(false);
+    const [inputHistory, setInputHistory] = React.useState([]);
+    const [ansHistory, setAnsHistory] = React.useState([]);
 
     const handlePress = (value: string) => {
         // If we have an answer, replace the display with that number
@@ -36,14 +39,16 @@ const Calculator = () => {
     const handleArithmetic = () => {
         try {
             let equation = input.replace(/Ans/g, ans);
-            console.log(equation);
+            setInputHistory((prev) => [...prev, equation]);
+
             let result = eval(equation);
             onChangeInput(result.toString());
             setAns(result);
+            setAnsHistory((prev) => [...prev, result.toString()]);
             setResetDisplay(true);
             setOperandPressed(false);
             } catch (error) {
-                console.log(error.message);
+
                 onChangeInput("ERROR");
             }
         };
@@ -51,6 +56,8 @@ const Calculator = () => {
     const handleOperation = (operation) => {
         try {
             let equation = input.replace(/Ans/g, ans);
+            let history = operation + "(" + equation + ")";
+            setInputHistory((prev) => [...prev, history]);
             const entry = parseFloat(eval(equation).toString());
 
             if (isNaN(entry)) {
@@ -78,6 +85,7 @@ const Calculator = () => {
 
             onChangeInput(result.toString());
             setAns(result.toString());
+            setAnsHistory((prev) => [...prev, result.toString()]);
             setResetDisplay(true);
             setOperandPressed(false);
         } catch (error) {
@@ -98,7 +106,7 @@ const Calculator = () => {
 
     const handleClear = () => {
         onChangeInput("");
-        };
+    };
 
     const buttons = [
         ["sin", "cos", "tan", "log"],
@@ -141,6 +149,11 @@ const Calculator = () => {
                             ))}
                     </View>))}
             </ScrollView>
+            <TouchableOpacity
+            onPress={() =>{navigation.navigate('History', {inputHistory, ansHistory});
+            }}>
+                <Text>View History</Text>
+            </TouchableOpacity>
         </View>
         );
     };
