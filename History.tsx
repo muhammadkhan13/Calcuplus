@@ -17,7 +17,7 @@ import {
 
 const History = ({ route }) => {
     const {inputHistory = [], ansHistory = []} = route.params || {};
-
+    
     const historyItem = ({ item, index }) => (
         <View>
             <Text>{inputHistory[index]}</Text>
