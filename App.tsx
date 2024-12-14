@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import type {PropsWithChildren} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -90,3 +83,4 @@ const styles = StyleSheet.create({
 
 
 export default App;
+
